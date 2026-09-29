@@ -1,0 +1,25 @@
+{
+  "name": "Mediterra - 지중해 식단 스마트 쿠킹",
+  "short_name": "Mediterra",
+  "description": "지중해 식단 스마트 쿠킹 & AI 셰프 안드로이드 앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8faf7",
+  "theme_color": "#154212",
+  "categories": ["lifestyle", "food", "health"],
+  "icons": [
+    {
+      "src": "./mediterra_olive_mark/screen.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./mediterra_olive_mark/screen.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
