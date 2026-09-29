@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mediterra - 지중해 식단 스마트 쿠킹 모바일 앱</title>
+  
+  <!-- PWA & Mobile Optimization Meta -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#154212">
+  <meta name="description" content="지중해 식단 스마트 쿠킹 & AI 셰프 코칭 모바일 웹 애플리케이션">
+
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: "#f2f8f0",
+              100: "#e1f0dc",
+              200: "#bcf0ae",
+              500: "#3b6934",
+              600: "#154212",
+              700: "#0f330d",
+              800: "#092208",
+            },
+            accent: {
+              coral: "#fe875d",
+              terracotta: "#a0401c",
+              ocean: "#005770",
+              oceanLight: "#84d0f2",
+              olive: "#3b6934",
+              sand: "#ecefeb",
+            }
+          },
+          fontFamily: {
+            epilogue: ['Epilogue', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  
+  <style>
+    @layer base {
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #0f1c11;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    }
+    
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Glass & Animation */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .dark-glass {
+      background: rgba(18, 30, 20, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Device frame wrapper for desktop */
+    .phone-container {
+      max-width: 440px;
+      height: 100%;
+      max-height: 940px;
+      margin: 0 auto;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 12px #1c2e1f, 0 0 0 14px rgba(255,255,255,0.1);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .phone-container {
+        max-width: 100%;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .desktop-bar { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-[#0e1810] text-stone-900 flex flex-col items-center justify-center min-h-screen p-0 sm:p-4">
+
+  <!-- Desktop Top Switcher Bar -->
+  <div class="desktop-bar hidden sm:flex items-center justify-between w-full max-w-md mb-3 px-3 text-stone-300 text-xs">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-semibold text-emerald-300">Mediterra Mobile App</span>
+    </div>
+    <div class="flex items-center gap-2 bg-stone-900/80 px-3 py-1 rounded-full border border-stone-700">
+      <span class="text-stone-400">뷰 모드:</span>
+      <button onclick="togglePhoneMode(false)" id="btn-mockup" class="px-2 py-0.5 rounded text-emerald-400 font-bold bg-emerald-950/60 text-[11px]">iPhone 목업</button>
+      <button onclick="togglePhoneMode(true)" id="btn-full" class="px-2 py-0.5 rounded text-stone-400 hover:text-white text-[11px]">전체화면</button>
+    </div>
+  </div>
+
+  <!-- Mobile Phone Container -->
+  <div id="app-frame" class="phone-container w-full bg-[#f8faf7] flex flex-col relative select-none">
+
+    <!-- Top Dynamic Island / Status Bar (Mobile Header) -->
+    <header class="sticky top-0 z-50 pt-safe bg-[#f8faf7]/90 backdrop-blur-xl border-b border-stone-200/60 shrink-0">
+      <!-- Status bar simulation -->
+      <div class="h-6 px-6 pt-1 flex items-center justify-between text-[11px] font-semibold text-stone-700">
+        <span id="current-time">09:41</span>
+        <div class="w-20 h-4 bg-stone-900 rounded-full mx-auto -mt-1 hidden sm:block"></div>
+        <div class="flex items-center gap-1.5 text-[12px]">
+          <span class="material-symbols-outlined text-[13px]">signal_cellular_alt</span>
+          <span class="material-symbols-outlined text-[13px]">wifi</span>
+          <span class="material-symbols-outlined text-[14px]">battery_full</span>
+        </div>
+      </div>
+
+      <!-- App Bar -->
+      <div class="h-14 px-5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-md shadow-brand-600/30">
+            <span class="material-symbols-outlined text-[20px]">spa</span>
+          </div>
+          <div>
+            <h1 class="font-epilogue font-bold text-base text-brand-600 tracking-tight leading-none">Mediterra</h1>
+            <span id="header-subtitle" class="text-[10px] text-stone-500 font-medium leading-none">스마트 지중해 식단</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="showNotificationAlert()" aria-label="알림" class="w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition-transform relative">
+            <span class="material-symbols-outlined text-[19px]">notifications</span>
+            <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent-coral"></span>
+          </button>
+          <button onclick="switchTab('profile')" aria-label="프로필" class="w-9 h-9 rounded-full overflow-hidden border border-brand-500/30 active:scale-95 transition-transform">
+            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzEMjsFE5zW7ey08Q7dpT7Y66rRY_zgPzzlf-7I3ONR4KpstzwiUinD0RoEo3XfkgLs8OZ9i4wI16rs0hzOs5QGNwUT2FYs1FPxq1HJgOHLwQpx_qlWOh5yOXvwIZjQzq66A5_NE3fegyg6VUfB9Z_wgyLPAW9E-E-P4Z5g3h9ACNSKwyn7AeQhqN-Y7qF1ICynXIy07bMovpNyvBaBSkbY_p_3FXPe1hxWKAo-PlPow2a5EnA4cc" alt="User">
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Content Area -->
+    <main id="main-scroll" class="flex-1 overflow-y-auto overscroll-contain pb-24">
+
+      <!-- ================= TAB 1: HOME (홈 대시보드) ================= -->
+      <section id="tab-home" class="tab-content active px-5 pt-3 pb-6">
+        <!-- Greeting & Mediterranean Vitality -->
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="text-xs font-semibold text-brand-600 bg-brand-100/80 px-2.5 py-0.5 rounded-full inline-block mb-1">오늘의 활력 케어</span>
+            <h2 class="font-epilogue font-bold text-xl text-stone-900">반가워요, 지은님 🌿</h2>
+            <p class="text-xs text-stone-500 mt-0.5">지중해 햇살을 담은 맞춤 식단이 준비되었어요</p>
+          </div>
+          <div class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-stone-200 flex flex-col items-center justify-center text-stone-800">
+            <span class="text-[9px] uppercase font-bold text-stone-400">SEP</span>
+            <span class="text-xs font-extrabold text-brand-600 leading-none">29</span>
+          </div>
+        </div>
+
+        <!-- Vitality Score Banner -->
+        <div class="bg-gradient-to-br from-brand-600 to-[#1e521b] text-white rounded-3xl p-5 shadow-lg shadow-brand-600/20 relative overflow-hidden mb-5">
+          <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center justify-between relative z-10">
+            <div>
+              <div class="flex items-center gap-1.5 text-xs text-emerald-200 font-semibold mb-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                지중해 밸런스 지수
+              </div>
+              <div class="text-2xl font-epilogue font-extrabold tracking-tight">94<span class="text-sm font-normal text-emerald-200"> / 100</span></div>
+              <p class="text-[11px] text-emerald-100/90 mt-1 max-w-[190px]">오메가-3와 폴리페놀 항산화 섭취량이 이상적입니다!</p>
+            </div>
+            <div class="relative w-16 h-16 flex items-center justify-center">
+              <svg class="w-16 h-16 transform -rotate-90">
+                <circle cx="32" cy="32" r="26" stroke="rgba(255,255,255,0.2)" stroke-width="6" fill="none"/>
+                <circle cx="32" cy="32" r="26" stroke="#bcf0ae" stroke-width="6" stroke-dasharray="163" stroke-dashoffset="12" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span class="absolute material-symbols-outlined text-[22px] text-[#bcf0ae]">favorite</span>
+            </div>
+          </div>
+          
+          <!-- Quick Stat Chips -->
+          <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/15 text-center">
+            <div class="bg-white/10 rounded-xl py-1.5 px-1">
+              <div class="text-[10px] text-emerald-200">칼로리</div>
+              <div class="text-xs font-bold font-epilogue">540 kcal</div>
+            </div>
+            <div class="bg-white/10 rounded-xl py-1.5 px-1">
+              <div class="text-[10px] text-emerald-200">단백질</div>
+              <div class="text-xs font-bold font-epilogue">38g</div>
+            </div>
+            <div class="bg-white/10 rounded-xl py-1.5 px-1">
+              <div class="text-[10px] text-emerald-200">항산화 지수</div>
+              <div class="text-xs font-bold font-epilogue">High 98%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Recipe Card (Click to go to Recipe Tab) -->
+        <div class="flex items-center justify-between mb-2.5">
+          <h3 class="font-epilogue font-bold text-base text-stone-900">오늘의 추천 셰프 레시피</h3>
+          <button onclick="switchTab('recipe')" class="text-xs text-brand-600 font-semibold flex items-center">
+            상세보기 <span class="material-symbols-outlined text-xs">chevron_right</span>
+          </button>
+        </div>
+
+        <div onclick="switchTab('recipe')" class="bg-white rounded-3xl p-3.5 border border-stone-200/80 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer mb-5">
+          <div class="relative w-full h-44 rounded-2xl overflow-hidden mb-3">
+            <img src="./_1/screen.png" onerror="this.src='https://lh3.googleusercontent.com/aida-public/AB6AXuD13bQFHhkoJE79GiMlZwjWsAeQPRuZ47hngFL_Ro1676_XMIvacX-YjlI9NdAnkVmiTTxszFPuAh3SIvRpqAL46xWDMQ9KuyHgmYGzHZR6raQplush72eMdME2qQvcuU5UIwYHzdrwEJt8rqcdVBQ7cpDz13wNcDY4XxoDOtccxJYGjLidc6BrbIl2qALxpZjJs9mj3yt8iABEDFUlf2XJZTokFGnrCwvNDF0xsCpb_ztottBbaqY'" alt="지중해 연어 샐러드" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+            <div class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-brand-600 flex items-center gap-1 shadow-sm">
+              <span class="material-symbols-outlined text-[13px]">timer</span> 20분 완성
+            </div>
+            <button onclick="event.stopPropagation(); toggleBookmark(this)" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-accent-coral shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">bookmark</span>
+            </button>
+            <div class="absolute bottom-2.5 left-3 right-3 text-white">
+              <span class="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Mediterranean Signature</span>
+              <h4 class="font-epilogue font-bold text-base leading-tight">엑스트라버진 연어 퀴노아 보울</h4>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-2 text-xs text-stone-500">
+              <span class="flex items-center gap-0.5 text-amber-500 font-bold">
+                <span class="material-symbols-outlined text-[14px]">star</span> 4.9 (128)
+              </span>
+              <span>·</span>
+              <span>난이도 쉬움</span>
+              <span>·</span>
+              <span>540 kcal</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-xl bg-brand-50 text-brand-600 text-xs font-bold flex items-center gap-1">
+              조리 시작 <span class="material-symbols-outlined text-[14px]">play_circle</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick AI Assistance Banner -->
+        <div onclick="switchTab('ai')" class="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+            </div>
+            <div>
+              <h4 class="font-epilogue font-bold text-xs text-emerald-950">AI 지중해 셰프에게 물어보기</h4>
+              <p class="text-[11px] text-emerald-700">"냉장고에 남은 재료로 드레싱 만들려면?"</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-emerald-600 text-sm">arrow_forward_ios</span>
+        </div>
+      </section>
+
+
+      <!-- ================= TAB 2: RECIPE DETAIL (레시피 상세) ================= -->
+      <section id="tab-recipe" class="tab-content px-5 pt-3 pb-6">
+        <!-- Recipe Hero Image -->
+        <div class="relative w-full h-64 rounded-3xl overflow-hidden mb-4 shadow-sm">
+          <img src="./_1/screen.png" onerror="this.src='https://lh3.googleusercontent.com/aida-public/AB6AXuD13bQFHhkoJE79GiMlZwjWsAeQPRuZ47hngFL_Ro1676_XMIvacX-YjlI9NdAnkVmiTTxszFPuAh3SIvRpqAL46xWDMQ9KuyHgmYGzHZR6raQplush72eMdME2qQvcuU5UIwYHzdrwEJt8rqcdVBQ7cpDz13wNcDY4XxoDOtccxJYGjLidc6BrbIl2qALxpZjJs9mj3yt8iABEDFUlf2XJZTokFGnrCwvNDF0xsCpb_ztottBbaqY'" alt="연어 퀴노아 요리" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/20 to-transparent"></div>
+          
+          <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+            <span class="bg-brand-600/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold">
+              지중해 슈퍼푸드 1위
+            </span>
+            <button onclick="toggleBookmark(this)" class="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-accent-coral shadow-sm">
+              <span class="material-symbols-outlined text-[19px]">bookmark</span>
+            </button>
+          </div>
+
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <span class="text-xs font-semibold text-emerald-300">Olivia Gastronomy Curated</span>
+            <h2 class="font-epilogue font-extrabold text-xl leading-snug">엑스트라버진 올리브유 팬시어드 연어 &amp; 펄 퀴노아 샐러드</h2>
+          </div>
+        </div>
+
+        <!-- Recipe Quick Specs -->
+        <div class="grid grid-cols-3 gap-2.5 mb-5 text-center">
+          <div class="bg-white rounded-2xl p-2.5 border border-stone-200/80">
+            <span class="material-symbols-outlined text-brand-500 text-[18px]">schedule</span>
+            <div class="text-[10px] text-stone-500 mt-0.5">조리 시간</div>
+            <div class="text-xs font-bold font-epilogue">20분</div>
+          </div>
+          <div class="bg-white rounded-2xl p-2.5 border border-stone-200/80">
+            <span class="material-symbols-outlined text-accent-coral text-[18px]">local_fire_department</span>
+            <div class="text-[10px] text-stone-500 mt-0.5">열량</div>
+            <div class="text-xs font-bold font-epilogue">540 kcal</div>
+          </div>
+          <div class="bg-white rounded-2xl p-2.5 border border-stone-200/80">
+            <span class="material-symbols-outlined text-accent-ocean text-[18px]">fitness_center</span>
+            <div class="text-[10px] text-stone-500 mt-0.5">고단백질</div>
+            <div class="text-xs font-bold font-epilogue">38g</div>
+          </div>
+        </div>
+
+        <!-- Ingredients Checklist -->
+        <div class="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-sm mb-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-epilogue font-bold text-sm text-stone-900 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-brand-600 text-[18px]">shopping_cart_checkout</span>
+              필요한 식재료 준비 (1인분)
+            </h3>
+            <span id="checked-count" class="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">0/6 준비됨</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">생연어 필렛 (노르웨이산)</span>
+              </div>
+              <span class="text-stone-500">180g</span>
+            </label>
+
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">엑스트라버진 올리브유</span>
+              </div>
+              <span class="text-stone-500">2 큰술 (30ml)</span>
+            </label>
+
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">삶은 펄 퀴노아</span>
+              </div>
+              <span class="text-stone-500">80g</span>
+            </label>
+
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">방울토마토 &amp; 루꼴라</span>
+              </div>
+              <span class="text-stone-500">각 50g</span>
+            </label>
+
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">생레몬 즙 &amp; 딜 허브</span>
+              </div>
+              <span class="text-stone-500">약간</span>
+            </label>
+
+            <label class="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" onchange="updateIngredientProgress()" class="ingredient-cb w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                <span class="font-semibold text-stone-800">천일염 &amp; 통후추 그라인드</span>
+              </div>
+              <span class="text-stone-500">한 꼬집</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Start Cooking CTA -->
+        <button onclick="startCookMode()" class="w-full py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-epilogue font-bold text-sm shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[20px]">restaurant</span>
+          스마트 인터랙티브 조리 시작하기
+        </button>
+      </section>
+
+
+      <!-- ================= TAB 3: COOK MODE (인터랙티브 조리 및 타이머) ================= -->
+      <section id="tab-cook" class="tab-content px-5 pt-3 pb-6">
+        <!-- Step Progress Indicator -->
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-brand-600" id="step-indicator">STEP 1 / 3</span>
+          <span class="text-xs text-stone-500 font-medium" id="step-time-est">예상 4분</span>
+        </div>
+        
+        <div class="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden mb-5">
+          <div id="step-progress-bar" class="bg-brand-600 h-full w-1/3 transition-all duration-300"></div>
+        </div>
+
+        <!-- Step Content Card -->
+        <div class="bg-white rounded-3xl p-5 border border-stone-200/80 shadow-sm mb-5">
+          <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4 bg-stone-100">
+            <img id="step-image" src="./_2/screen.png" onerror="this.src='./_1/screen.png'" alt="조리 단계" class="w-full h-full object-cover">
+            <div class="absolute bottom-2 left-2 bg-stone-900/80 backdrop-blur-md text-white text-[11px] px-2.5 py-1 rounded-full font-medium">
+              💡 셰프 팁: 연어는 키친타올로 물기를 완벽히 제거하세요
+            </div>
+          </div>
+
+          <h3 id="step-title" class="font-epilogue font-bold text-lg text-stone-900 mb-1">
+            1단계: 연어 밑간 &amp; 팬 예열
+          </h3>
+          <p id="step-desc" class="text-xs text-stone-600 leading-relaxed">
+            연어 표면에 소금과 통후추를 고르게 뿌리고 엑스트라버진 올리브유 1스푼을 발라 마리네이드합니다. 중약불로 팬을 1분간 달궈주세요.
+          </p>
+        </div>
+
+        <!-- Interactive Smart Timer -->
+        <div class="bg-gradient-to-b from-stone-900 to-stone-950 text-white rounded-3xl p-5 shadow-xl text-center mb-5 relative overflow-hidden">
+          <div class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold mb-1">
+            Smart Cooking Timer
+          </div>
+          
+          <div id="timer-display" class="font-epilogue font-extrabold text-4xl text-white tracking-widest my-2">
+            04:00
+          </div>
+          
+          <p id="timer-status-text" class="text-xs text-stone-400 mb-4">팬 예열 및 겉면 시어링 타이머</p>
+
+          <div class="flex items-center justify-center gap-3">
+            <button onclick="resetTimer()" class="w-12 h-12 rounded-full bg-stone-800 text-stone-300 flex items-center justify-center active:scale-90 transition-transform">
+              <span class="material-symbols-outlined text-[20px]">restart_alt</span>
+            </button>
+            <button onclick="toggleTimer()" id="btn-timer-toggle" class="px-6 h-12 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/30 active:scale-95 transition-transform">
+              <span class="material-symbols-outlined text-[20px]" id="timer-icon">play_arrow</span>
+              <span id="timer-btn-label">타이머 시작</span>
+            </button>
+            <button onclick="addTimerMinute(1)" class="w-12 h-12 rounded-full bg-stone-800 text-stone-300 font-bold text-xs flex items-center justify-center active:scale-90 transition-transform">
+              +1m
+            </button>
+          </div>
+        </div>
+
+        <!-- Step Navigation Buttons -->
+        <div class="flex items-center gap-3">
+          <button onclick="prevStep()" id="btn-prev-step" class="w-1/3 py-3.5 rounded-2xl bg-stone-100 text-stone-600 font-semibold text-xs disabled:opacity-40" disabled>
+            이전 단계
+          </button>
+          <button onclick="nextStep()" id="btn-next-step" class="w-2/3 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-600/20 flex items-center justify-center gap-1">
+            다음 조리 단계 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+
+      <!-- ================= TAB 4: AI COACH (대화형 지중해 셰프) ================= -->
+      <section id="tab-ai" class="tab-content px-5 pt-3 pb-6">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+            <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+          </div>
+          <div>
+            <h2 class="font-epilogue font-bold text-base text-stone-900">Mediterra AI 셰프</h2>
+            <p class="text-[11px] text-emerald-600 font-medium">지중해 요리 및 식재료 대체 실시간 코칭</p>
+          </div>
+        </div>
+
+        <!-- Quick Prompt Suggestion Chips -->
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-3 no-scrollbar">
+          <button onclick="sendQuickPrompt('연어 대신 다른 생선으로 대체할 수 있나요?')" class="shrink-0 px-3 py-1.5 rounded-full bg-white border border-stone-200 text-[11px] text-stone-700 font-medium hover:border-brand-500 hover:text-brand-600 transition-colors">
+            🐟 연어 대체 생선 추천
+          </button>
+          <button onclick="sendQuickPrompt('지중해식 레몬 드레싱 황금비율 알려줘')" class="shrink-0 px-3 py-1.5 rounded-full bg-white border border-stone-200 text-[11px] text-stone-700 font-medium hover:border-brand-500 hover:text-brand-600 transition-colors">
+            🍋 레몬 드레싱 황금비율
+          </button>
+          <button onclick="sendQuickPrompt('올리브유 산패 막는 보관 팁 알려줘')" class="shrink-0 px-3 py-1.5 rounded-full bg-white border border-stone-200 text-[11px] text-stone-700 font-medium hover:border-brand-500 hover:text-brand-600 transition-colors">
+            🫒 올리브유 보관법
+          </button>
+        </div>
+
+        <!-- Chat Message Log Box -->
+        <div id="chat-box" class="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-sm min-h-[300px] max-h-[380px] overflow-y-auto flex flex-col gap-3 mb-3">
+          <!-- AI Welcome Message -->
+          <div class="flex items-start gap-2.5">
+            <div class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs shadow-sm">
+              <span class="material-symbols-outlined text-[14px]">smart_toy</span>
+            </div>
+            <div class="bg-stone-50 border border-stone-100 rounded-2xl rounded-tl-none p-3 text-xs text-stone-800 leading-relaxed max-w-[85%]">
+              안녕하세요! 🌿 지중해 퀴진 어시스턴트입니다. 조리 과정 중 궁금한 점이나 대체 식재료, 영양 밸런스에 대해 무엇이든 편하게 물어보세요.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <form onsubmit="handleChatSubmit(event)" class="flex items-center gap-2 bg-white rounded-2xl p-1.5 border border-stone-300 shadow-sm focus-within:border-brand-500 transition-colors">
+          <input id="chat-input" type="text" placeholder="AI 셰프에게 요리 팁 물어보기..." class="flex-1 px-3 py-2 text-xs bg-transparent outline-none text-stone-800 placeholder:text-stone-400">
+          <button type="submit" aria-label="메시지 전송" class="w-8 h-8 rounded-xl bg-brand-600 text-white flex items-center justify-center hover:bg-brand-700 active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+          </button>
+        </form>
+      </section>
+
+
+      <!-- ================= TAB 5: PROFILE & NUTRITION (영양 및 내 정보) ================= -->
+      <section id="tab-profile" class="tab-content px-5 pt-3 pb-6">
+        <!-- User Profile Card -->
+        <div class="bg-white rounded-3xl p-5 border border-stone-200/80 shadow-sm mb-5 text-center relative overflow-hidden">
+          <div class="w-16 h-16 rounded-full mx-auto mb-2 overflow-hidden border-2 border-brand-500 shadow-md">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzEMjsFE5zW7ey08Q7dpT7Y66rRY_zgPzzlf-7I3ONR4KpstzwiUinD0RoEo3XfkgLs8OZ9i4wI16rs0hzOs5QGNwUT2FYs1FPxq1HJgOHLwQpx_qlWOh5yOXvwIZjQzq66A5_NE3fegyg6VUfB9Z_wgyLPAW9E-E-P4Z5g3h9ACNSKwyn7AeQhqN-Y7qF1ICynXIy07bMovpNyvBaBSkbY_p_3FXPe1hxWKAo-PlPow2a5EnA4cc" alt="User" class="w-full h-full object-cover">
+          </div>
+          <h2 class="font-epilogue font-bold text-base text-stone-900">이지은 님</h2>
+          <span class="text-[11px] font-semibold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-full inline-block mt-0.5">지중해 라이프스타일 14일차</span>
+
+          <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-stone-100 text-center">
+            <div>
+              <div class="text-[10px] text-stone-400 font-medium">완성한 요리</div>
+              <div class="text-sm font-extrabold font-epilogue text-stone-800">18회</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-stone-400 font-medium">평균 점수</div>
+              <div class="text-sm font-extrabold font-epilogue text-brand-600">96점</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-stone-400 font-medium">스크랩 레시피</div>
+              <div class="text-sm font-extrabold font-epilogue text-accent-terracotta">7개</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Nutrition Graph Simulation -->
+        <div class="bg-white rounded-3xl p-5 border border-stone-200/80 shadow-sm mb-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-epilogue font-bold text-sm text-stone-900">주간 지중해 식단 지수</h3>
+            <span class="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">상위 5% 달성</span>
+          </div>
+
+          <!-- Bar chart -->
+          <div class="flex items-end justify-between h-28 gap-2 pt-2 border-b border-stone-100 pb-2">
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-200 rounded-t-lg" style="height: 65%;"></div>
+              <span class="text-[10px] text-stone-400">월</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-200 rounded-t-lg" style="height: 80%;"></div>
+              <span class="text-[10px] text-stone-400">화</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-200 rounded-t-lg" style="height: 70%;"></div>
+              <span class="text-[10px] text-stone-400">수</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-200 rounded-t-lg" style="height: 90%;"></div>
+              <span class="text-[10px] text-stone-400">목</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-300 rounded-t-lg" style="height: 85%;"></div>
+              <span class="text-[10px] text-stone-400">금</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-emerald-400 rounded-t-lg" style="height: 95%;"></div>
+              <span class="text-[10px] text-stone-400">토</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-brand-600 rounded-t-lg shadow-sm" style="height: 98%;"></div>
+              <span class="text-[10px] font-bold text-brand-600">오늘</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-stone-500 mt-2.5 text-center">불포화지방산과 채소 섭취 비율이 꾸준히 증가하고 있습니다.</p>
+        </div>
+
+        <!-- App Preferences -->
+        <div class="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-sm space-y-2">
+          <div class="flex items-center justify-between p-2 text-xs font-semibold text-stone-700 cursor-pointer hover:bg-stone-50 rounded-xl transition-colors">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-stone-500 text-[18px]">tune</span>
+              식이 선호 및 알레르기 설정
+            </span>
+            <span class="material-symbols-outlined text-stone-400 text-sm">chevron_right</span>
+          </div>
+          <div class="flex items-center justify-between p-2 text-xs font-semibold text-stone-700 cursor-pointer hover:bg-stone-50 rounded-xl transition-colors">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-stone-500 text-[18px]">volume_up</span>
+              스마트 요리 음성 안내 가이드
+            </span>
+            <span class="text-xs text-brand-600 font-bold">켜짐</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Native App Tab Bar (5 Tabs) -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto z-50 glass-nav border-t border-stone-200/70 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+      <div class="h-16 px-3 flex items-center justify-around">
+
+        <!-- Tab 1: Home -->
+        <button onclick="switchTab('home')" id="tab-btn-home" class="flex flex-col items-center gap-0.5 text-brand-600 transition-colors w-14">
+          <span class="material-symbols-outlined text-[24px]">home</span>
+          <span class="text-[10px] font-bold">홈</span>
+        </button>
+
+        <!-- Tab 2: Recipe -->
+        <button onclick="switchTab('recipe')" id="tab-btn-recipe" class="flex flex-col items-center gap-0.5 text-stone-400 hover:text-stone-700 transition-colors w-14">
+          <span class="material-symbols-outlined text-[24px]">menu_book</span>
+          <span class="text-[10px] font-semibold">레시피</span>
+        </button>
+
+        <!-- Tab 3: Cook Floating Center Action -->
+        <button onclick="switchTab('cook')" id="tab-btn-cook" class="flex flex-col items-center justify-center -mt-5 w-13 h-13 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-600/40 active:scale-90 transition-transform">
+          <span class="material-symbols-outlined text-[26px]">restaurant</span>
+        </button>
+
+        <!-- Tab 4: AI Coach -->
+        <button onclick="switchTab('ai')" id="tab-btn-ai" class="flex flex-col items-center gap-0.5 text-stone-400 hover:text-stone-700 transition-colors w-14">
+          <span class="material-symbols-outlined text-[24px]">auto_awesome</span>
+          <span class="text-[10px] font-semibold">AI 코치</span>
+        </button>
+
+        <!-- Tab 5: Profile -->
+        <button onclick="switchTab('profile')" id="tab-btn-profile" class="flex flex-col items-center gap-0.5 text-stone-400 hover:text-stone-700 transition-colors w-14">
+          <span class="material-symbols-outlined text-[24px]">person</span>
+          <span class="text-[10px] font-semibold">내 지표</span>
+        </button>
+
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- JavaScript Logic for App Interactivity -->
+  <script>
+    // Tab State Management
+    const tabTitles = {
+      home: '홈 피드',
+      recipe: '연어 퀴노아 레시피',
+      cook: '스마트 조리 모드',
+      ai: 'AI 셰프 어시스턴트',
+      profile: '내 지표 & 건강 리포트'
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      // Update Subtitle
+      document.getElementById('header-subtitle').textContent = tabTitles[tabId] || 'Mediterra';
+
+      // Update Tab Button Active Classes
+      const tabs = ['home', 'recipe', 'ai', 'profile'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tab-btn-' + t);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = 'flex flex-col items-center gap-0.5 text-brand-600 transition-colors w-14';
+            btn.querySelector('span:last-child').className = 'text-[10px] font-bold';
+          } else {
+            btn.className = 'flex flex-col items-center gap-0.5 text-stone-400 hover:text-stone-700 transition-colors w-14';
+            btn.querySelector('span:last-child').className = 'text-[10px] font-semibold';
+          }
+        }
+      });
+
+      // Scroll to top
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Ingredient Progress
+    function updateIngredientProgress() {
+      const checkboxes = document.querySelectorAll('.ingredient-cb');
+      const checked = document.querySelectorAll('.ingredient-cb:checked').length;
+      document.getElementById('checked-count').textContent = `${checked}/${checkboxes.length} 준비됨`;
+    }
+
+    // Bookmark Toggle
+    function toggleBookmark(btn) {
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon.textContent === 'bookmark') {
+        icon.textContent = 'bookmark_added';
+        btn.classList.add('text-brand-600');
+        btn.classList.remove('text-accent-coral');
+      } else {
+        icon.textContent = 'bookmark';
+        btn.classList.remove('text-brand-600');
+        btn.classList.add('text-accent-coral');
+      }
+    }
+
+    // Step Cooking Logic
+    const cookingSteps = [
+      {
+        step: 1,
+        total: 3,
+        timeEst: '예상 4분',
+        title: '1단계: 연어 밑간 & 팬 예열',
+        desc: '연어 표면에 소금과 통후추를 고르게 뿌리고 엑스트라버진 올리브유 1스푼을 발라 마리네이드합니다. 중약불로 팬을 1분간 달궈주세요.',
+        tip: '💡 셰프 팁: 연어는 키친타올로 물기를 완벽히 제거하세요',
+        image: './_2/screen.png',
+        defaultSeconds: 240
+      },
+      {
+        step: 2,
+        total: 3,
+        timeEst: '예상 6분',
+        title: '2단계: 골든 크리스피 팬 시어링',
+        desc: '달궈진 팬에 연어 껍질 부분을 아래로 두고 3분간 바삭하게 구운 뒤, 뒤집어서 2분간 촉촉하게 익힙니다.',
+        tip: '💡 셰프 팁: 뒤집기 전에 껍질이 팬에서 자연스럽게 떨어질 때까지 건드리지 마세요',
+        image: './_3/screen.png',
+        defaultSeconds: 360
+      },
+      {
+        step: 3,
+        total: 3,
+        timeEst: '예상 5분',
+        title: '3단계: 펄 퀴노아 & 레몬 드레싱 플레이팅',
+        desc: '볼에 삶은 퀴노아, 반으로 썬 방울토마토, 루꼴라를 담고 올리브유와 레몬즙을 버무린 후 잘 구워진 연어를 얹어 완성합니다.',
+        tip: '💡 셰프 팁: 마지막에 신선한 딜 허브를 찢어 올리면 풍미가 극대화됩니다',
+        image: './_4/screen.png',
+        defaultSeconds: 300
+      }
+    ];
+
+    let currentStepIdx = 0;
+    let timerSeconds = 240;
+    let timerInterval = null;
+    let isTimerRunning = false;
+
+    function renderStep() {
+      const stepData = cookingSteps[currentStepIdx];
+      document.getElementById('step-indicator').textContent = `STEP ${stepData.step} / ${stepData.total}`;
+      document.getElementById('step-time-est').textContent = stepData.timeEst;
+      document.getElementById('step-progress-bar').style.width = `${(stepData.step / stepData.total) * 100}%`;
+      document.getElementById('step-title').textContent = stepData.title;
+      document.getElementById('step-desc').textContent = stepData.desc;
+      document.getElementById('step-image').src = stepData.image;
+
+      document.getElementById('btn-prev-step').disabled = currentStepIdx === 0;
+      if (currentStepIdx === cookingSteps.length - 1) {
+        document.getElementById('btn-next-step').innerHTML = '요리 완성 & 피드백 <span class="material-symbols-outlined text-sm">celebration</span>';
+      } else {
+        document.getElementById('btn-next-step').innerHTML = '다음 조리 단계 <span class="material-symbols-outlined text-sm">arrow_forward</span>';
+      }
+
+      resetTimer(stepData.defaultSeconds);
+    }
+
+    function startCookMode() {
+      currentStepIdx = 0;
+      switchTab('cook');
+      renderStep();
+    }
+
+    function nextStep() {
+      if (currentStepIdx < cookingSteps.length - 1) {
+        currentStepIdx++;
+        renderStep();
+      } else {
+        alert('🎉 축하합니다! 완벽한 지중해 연어 퀴노아 볼 요리가 완성되었습니다.');
+        switchTab('profile');
+      }
+    }
+
+    function prevStep() {
+      if (currentStepIdx > 0) {
+        currentStepIdx--;
+        renderStep();
+      }
+    }
+
+    // Timer Functions
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateTimerUI() {
+      document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+    }
+
+    function toggleTimer() {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        document.getElementById('timer-icon').textContent = 'play_arrow';
+        document.getElementById('timer-btn-label').textContent = '타이머 재개';
+        document.getElementById('btn-timer-toggle').className = 'px-6 h-12 rounded-full bg-brand-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg';
+      } else {
+        if (timerSeconds <= 0) return;
+        isTimerRunning = true;
+        document.getElementById('timer-icon').textContent = 'pause';
+        document.getElementById('timer-btn-label').textContent = '일시 정지';
+        document.getElementById('btn-timer-toggle').className = 'px-6 h-12 rounded-full bg-accent-terracotta text-white font-bold text-xs flex items-center gap-2 shadow-lg';
+        
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            updateTimerUI();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            document.getElementById('timer-icon').textContent = 'play_arrow';
+            document.getElementById('timer-btn-label').textContent = '완료됨';
+            alert('⏰ 타이머가 종료되었습니다! 다음 단계를 확인하세요.');
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer(seconds) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerSeconds = seconds || cookingSteps[currentStepIdx].defaultSeconds;
+      updateTimerUI();
+      document.getElementById('timer-icon').textContent = 'play_arrow';
+      document.getElementById('timer-btn-label').textContent = '타이머 시작';
+      document.getElementById('btn-timer-toggle').className = 'px-6 h-12 rounded-full bg-brand-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg';
+    }
+
+    function addTimerMinute(mins) {
+      timerSeconds += mins * 60;
+      updateTimerUI();
+    }
+
+    // AI Chat Simulation
+    function sendQuickPrompt(text) {
+      const input = document.getElementById('chat-input');
+      input.value = text;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatBox = document.getElementById('chat-box');
+
+      // User Message
+      const userBubble = document.createElement('div');
+      userBubble.className = 'flex items-start justify-end gap-2';
+      userBubble.innerHTML = `
+        <div class="bg-brand-600 text-white rounded-2xl rounded-tr-none p-3 text-xs leading-relaxed max-w-[85%] shadow-sm">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      chatBox.appendChild(userBubble);
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // AI Typing response simulation
+      setTimeout(() => {
+        let reply = "지중해 요리의 핵심은 재료 본연의 신선함과 고품질 올리브유의 풍미를 살리는 것입니다. ";
+        if (text.includes("대체") || text.includes("생선")) {
+          reply += "연어 대신 <strong>대구(Cod)</strong>, <strong>도미</strong>, 또는 <strong>농어</strong>를 사용하셔도 아주 훌륭합니다. 조리 시간은 두께에 따라 1~2분 정도 줄여주세요!";
+        } else if (text.includes("드레싱") || text.includes("레몬")) {
+          reply += "가장 완벽한 지중해 비율은 <strong>엑스트라버진 올리브유 3 : 레몬즙 1 : 꿀 0.5 : 소금/후추 약간</strong>입니다.";
+        } else if (text.includes("보관") || text.includes("올리브유")) {
+          reply += "엑스트라버진 올리브유는 빛과 열에 취약하므로 <strong>직사광선이 없는 서늘한 암소(15~20°C)</strong>에 밀폐하여 보관하세요.";
+        } else {
+          reply += "추가로 궁금한 점이나 식단 조절 관련 팁이 필요하시면 언제든 질문해주세요!";
+        }
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'flex items-start gap-2.5';
+        aiBubble.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs shadow-sm">
+            <span class="material-symbols-outlined text-[14px]">smart_toy</span>
+          </div>
+          <div class="bg-stone-50 border border-stone-100 rounded-2xl rounded-tl-none p-3 text-xs text-stone-800 leading-relaxed max-w-[85%]">
+            ${reply}
+          </div>
+        `;
+        chatBox.appendChild(aiBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 500);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Realtime Clock simulation
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const mins = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('current-time').textContent = `${hours}:${mins}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Desktop Frame Switcher
+    function togglePhoneMode(fullscreen) {
+      const frame = document.getElementById('app-frame');
+      const btnMockup = document.getElementById('btn-mockup');
+      const btnFull = document.getElementById('btn-full');
+
+      if (fullscreen) {
+        frame.style.maxWidth = '100%';
+        frame.style.maxHeight = '100vh';
+        frame.style.borderRadius = '0';
+        frame.style.boxShadow = 'none';
+        btnFull.className = 'px-2 py-0.5 rounded text-emerald-400 font-bold bg-emerald-950/60 text-[11px]';
+        btnMockup.className = 'px-2 py-0.5 rounded text-stone-400 hover:text-white text-[11px]';
+      } else {
+        frame.style.maxWidth = '440px';
+        frame.style.maxHeight = '940px';
+        frame.style.borderRadius = '44px';
+        frame.style.boxShadow = '0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 12px #1c2e1f, 0 0 0 14px rgba(255,255,255,0.1)';
+        btnMockup.className = 'px-2 py-0.5 rounded text-emerald-400 font-bold bg-emerald-950/60 text-[11px]';
+        btnFull.className = 'px-2 py-0.5 rounded text-stone-400 hover:text-white text-[11px]';
+      }
+    }
+
+    function showNotificationAlert() {
+      alert('🔔 새로운 알림: 오늘 저녁 지중해 오메가-3 충전 목표 달성까지 1끼 남았습니다!');
+    }
+  </script>
+
+</body>
+</html>
