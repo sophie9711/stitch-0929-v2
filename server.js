@@ -21,6 +21,11 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   let decodedUrl = decodeURI(req.url.split('?')[0]);
+  if (decodedUrl === '/api/contact') {
+    const contactHandler = require('./api/contact.js');
+    return contactHandler(req, res);
+  }
+
   if (decodedUrl === '/') {
     decodedUrl = '/index.html';
   }

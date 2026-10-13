@@ -713,10 +713,15 @@
         <div id="contact-view-form" class="space-y-4">
           <!-- Main Form Card -->
           <div class="bg-white rounded-3xl p-4 border border-stone-200/80 shadow-sm">
-            <h3 class="font-bold text-xs text-stone-900 mb-2 flex items-center gap-1.5">
-              <span class="material-symbols-rounded text-md-primary text-[17px]">category</span>
-              문의 유형을 선택해 주세요
-            </h3>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-xs text-stone-900 flex items-center gap-1.5">
+                <span class="material-symbols-rounded text-md-primary text-[17px]">category</span>
+                문의 유형을 선택해 주세요
+              </h3>
+              <span class="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                <span class="material-symbols-rounded text-xs">mail</span> 이메일 실시간 수신
+              </span>
+            </div>
             
             <!-- Category Chips -->
             <div class="grid grid-cols-2 gap-2 mb-3" id="inquiry-type-group">
@@ -1449,13 +1454,14 @@
       }
     }
 
-    function handleInquirySubmit(e) {
+    async function handleInquirySubmit(e) {
       e.preventDefault();
       const name = document.getElementById('inquiry-name').value.trim();
       const contact = document.getElementById('inquiry-contact').value.trim();
       const title = document.getElementById('inquiry-title').value.trim();
       const message = document.getElementById('inquiry-message').value.trim();
       const fileBadge = document.getElementById('attached-file-badge').textContent;
+      const submitBtn = document.getElementById('btn-submit-inquiry');
 
       if (!title || !message) {
         showAndroidToast('제목과 문의 내용을 모두 입력해 주세요.');
@@ -1475,6 +1481,34 @@
         status: '답변 대기중'
       };
 
+      // Loading UI State
+      const originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <span class="material-symbols-rounded animate-spin text-base">progress_activity</span> 이메일 발송 중...
+      `;
+
+      let emailSentSuccess = false;
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newInquiry)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          emailSentSuccess = true;
+        } else {
+          console.warn('API returned non-ok:', result);
+        }
+      } catch (err) {
+        console.error('Fetch /api/contact error:', err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+
       // Save to localStorage
       try {
         const stored = JSON.parse(localStorage.getItem('mediterra_inquiries') || '[]');
@@ -1493,7 +1527,12 @@
       document.getElementById('attached-file-badge').className = 'text-[11px] text-stone-400 truncate max-w-[200px]';
 
       renderInquiryHistory();
-      showAndroidToast(`1:1 문의가 안전하게 접수되었습니다 (#${inquiryId}) 🌿`);
+
+      if (emailSentSuccess) {
+        showAndroidToast(`이메일로 문의가 발송되었습니다! (uplus8100@gmail.com) 💌`);
+      } else {
+        showAndroidToast(`1:1 문의가 안전하게 접수되었습니다 (#${inquiryId}) 🌿`);
+      }
     }
 
     function renderInquiryHistory() {
