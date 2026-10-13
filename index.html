@@ -664,23 +664,48 @@
             </h3>
             
             <!-- Category Chips -->
-            <div class="grid grid-cols-2 gap-2 mb-3.5" id="inquiry-type-group">
-              <button type="button" onclick="selectInquiryType(this, '레시피/식단 제안')" class="inquiry-type-btn active text-left p-2.5 rounded-2xl border border-md-primary bg-md-secondaryContainer/50 text-stone-900 text-xs font-bold flex items-center gap-2 transition-all">
-                <span class="text-base">🥗</span>
-                <span>레시피/식단 제안</span>
+            <div class="grid grid-cols-2 gap-2 mb-3" id="inquiry-type-group">
+              <button type="button" onclick="selectInquiryType(this, '레시피/식단 제안')" class="inquiry-type-btn active text-left p-2.5 rounded-2xl border border-md-primary bg-md-secondaryContainer/50 text-stone-900 text-xs font-bold flex items-center justify-between gap-1 transition-all">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">🥗</span>
+                  <span>레시피/식단 제안</span>
+                </div>
               </button>
-              <button type="button" onclick="selectInquiryType(this, '앱 오류/버그 제보')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center gap-2 transition-all">
-                <span class="text-base">🐛</span>
-                <span>앱 오류/버그 제보</span>
+              <button type="button" onclick="selectInquiryType(this, '앱 오류/버그 제보')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center justify-between gap-1 transition-all">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">🐛</span>
+                  <span>앱 오류/버그 제보</span>
+                </div>
               </button>
-              <button type="button" onclick="selectInquiryType(this, '기능 개선 아이디어')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center gap-2 transition-all">
-                <span class="text-base">💡</span>
-                <span>기능 개선 아이디어</span>
+              <button type="button" onclick="selectInquiryType(this, '기능 개선 아이디어')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center justify-between gap-1 transition-all">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">💡</span>
+                  <span>기능 개선 아이디어</span>
+                </div>
               </button>
-              <button type="button" onclick="selectInquiryType(this, '일반 문의 및 기타')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center gap-2 transition-all">
-                <span class="text-base">💬</span>
-                <span>일반 문의 및 기타</span>
+              <button type="button" onclick="selectInquiryType(this, '일반 문의 및 기타')" class="inquiry-type-btn text-left p-2.5 rounded-2xl border border-amber-300 bg-amber-50 hover:bg-amber-100/80 text-amber-950 text-xs font-bold flex items-center justify-between gap-1 transition-all shadow-xs" title="카카오톡 오픈채팅방 연결">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">💬</span>
+                  <span>일반 문의 및 기타</span>
+                </div>
+                <span class="material-symbols-rounded text-xs text-amber-700">open_in_new</span>
               </button>
+            </div>
+
+            <!-- Kakao Open Chat Banner -->
+            <div id="kakao-inquiry-banner" class="hidden mb-3.5 p-3 rounded-2xl bg-amber-50/90 border border-amber-200 flex items-center justify-between gap-2 shadow-xs">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-amber-300 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-rounded text-amber-950 text-sm">chat</span>
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-stone-900 block leading-tight">카카오톡 1:1 오픈채팅</span>
+                  <span class="text-[10px] text-stone-600">일반 문의는 오픈채팅방에서 실시간 상담 가능합니다.</span>
+                </div>
+              </div>
+              <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-900 font-bold text-[11px] shrink-0 flex items-center gap-0.5 active:scale-95 transition-all shadow-xs">
+                오픈채팅 <span class="material-symbols-rounded text-xs">arrow_forward</span>
+              </a>
             </div>
 
             <!-- Input Form Fields -->
@@ -839,9 +864,9 @@
             <a href="mailto:support@mediterra.app" class="py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold flex items-center justify-center gap-1 transition-colors">
               <span class="material-symbols-rounded text-sm">mail</span> 이메일 문의
             </a>
-            <button onclick="showAndroidToast('카카오톡 1:1 상담 채널 (@mediterra) 연결 준비 중입니다.')" class="py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-900 font-bold flex items-center justify-center gap-1 transition-colors">
+            <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" class="py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-900 font-bold flex items-center justify-center gap-1 transition-colors active:scale-95 shadow-sm">
               <span class="material-symbols-rounded text-sm">chat</span> 카카오톡 상담
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -1288,14 +1313,25 @@
     }
 
     // ================= Inquiry / Contact Section Features =================
+    const KAKAO_OPEN_CHAT_URL = 'https://open.kakao.com/o/sWxAEcSi';
     let selectedInquiryType = '레시피/식단 제안';
 
     function selectInquiryType(btn, type) {
       selectedInquiryType = type;
       document.querySelectorAll('.inquiry-type-btn').forEach(b => {
-        b.className = 'inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center gap-2 transition-all';
+        b.className = 'inquiry-type-btn text-left p-2.5 rounded-2xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-medium flex items-center justify-between gap-1 transition-all';
       });
-      btn.className = 'inquiry-type-btn active text-left p-2.5 rounded-2xl border border-md-primary bg-md-secondaryContainer/50 text-stone-900 text-xs font-bold flex items-center gap-2 transition-all';
+
+      const banner = document.getElementById('kakao-inquiry-banner');
+      if (type === '일반 문의 및 기타') {
+        btn.className = 'inquiry-type-btn active text-left p-2.5 rounded-2xl border border-amber-400 bg-amber-100/80 text-stone-900 text-xs font-bold flex items-center justify-between gap-1 transition-all';
+        if (banner) banner.classList.remove('hidden');
+        showAndroidToast('카카오톡 1:1 오픈채팅방으로 연결됩니다 💬');
+        window.open(KAKAO_OPEN_CHAT_URL, '_blank');
+      } else {
+        btn.className = 'inquiry-type-btn active text-left p-2.5 rounded-2xl border border-md-primary bg-md-secondaryContainer/50 text-stone-900 text-xs font-bold flex items-center justify-between gap-1 transition-all';
+        if (banner) banner.classList.add('hidden');
+      }
     }
 
     function updateInquiryCharCount(textarea) {
