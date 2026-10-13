@@ -148,6 +148,9 @@
       <button onclick="switchTab('contact')" title="문의하기" class="px-2 py-0.5 rounded text-stone-300 hover:text-emerald-300 text-[11px] flex items-center gap-1 bg-stone-800/80 active:scale-95 transition-transform">
         <span class="material-symbols-rounded text-[13px]">support_agent</span> 문의
       </button>
+      <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" title="카카오톡 오픈채팅" class="px-2.5 py-0.5 rounded text-amber-950 font-black bg-[#FEE500] hover:bg-[#FADA0A] text-[11px] flex items-center gap-1 active:scale-95 transition-transform shadow-xs">
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg> 카톡 문의
+      </a>
     </div>
   </div>
 
@@ -189,15 +192,18 @@
           </div>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="shareApp()" id="btn-share-app" title="앱 공유" class="px-2.5 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
+          <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" id="header-btn-kakao" title="카카오톡 1:1 상담" class="px-2.5 py-1 rounded-full bg-[#FEE500] hover:bg-[#FADA0A] text-[#3C1E1E] text-xs font-black flex items-center gap-1 active:scale-95 transition-all shadow-xs">
+            <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg> 카톡
+          </a>
+          <button onclick="shareApp()" id="btn-share-app" title="앱 공유" class="px-2 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
             <span class="material-symbols-rounded text-sm text-md-primary">share</span> 공유
           </button>
-          <button onclick="installPWA()" id="btn-install-app" title="앱 설치" class="px-2.5 py-1 rounded-full bg-md-secondaryContainer text-md-onSecondaryContainer text-xs font-bold flex items-center gap-1 hover:bg-emerald-200 active:scale-95 transition-all">
+          <button onclick="installPWA()" id="btn-install-app" title="앱 설치" class="px-2 py-1 rounded-full bg-md-secondaryContainer text-md-onSecondaryContainer text-xs font-bold flex items-center gap-1 hover:bg-emerald-200 active:scale-95 transition-all">
             <span class="material-symbols-rounded text-sm">download</span> 설치
           </button>
-          <button onclick="showAndroidToast('새 알림: 오늘의 지중해 식단 목표를 90% 달성했습니다!')" aria-label="알림" class="w-9 h-9 rounded-full hover:bg-stone-200/60 flex items-center justify-center text-stone-700 active:scale-95 transition-transform relative">
-            <span class="material-symbols-rounded text-[21px]">notifications</span>
-            <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent-coral"></span>
+          <button onclick="showAndroidToast('새 알림: 오늘의 지중해 식단 목표를 90% 달성했습니다!')" aria-label="알림" class="w-8 h-8 rounded-full hover:bg-stone-200/60 flex items-center justify-center text-stone-700 active:scale-95 transition-transform relative">
+            <span class="material-symbols-rounded text-[20px]">notifications</span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent-coral"></span>
           </button>
         </div>
       </div>
@@ -308,18 +314,31 @@
           <span class="material-symbols-rounded text-md-primary text-base">arrow_forward</span>
         </div>
 
-        <!-- Inquiry & Support Quick Banner -->
-        <div onclick="switchTab('contact')" class="mt-3 bg-white border border-stone-200/80 rounded-2xl p-3 flex items-center justify-between cursor-pointer hover:bg-stone-50 active:scale-[0.98] transition-all">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-md-secondaryContainer text-md-primary flex items-center justify-center shadow-xs">
-              <span class="material-symbols-rounded text-[19px]">support_agent</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-xs text-stone-800">앱 문의 &amp; 개선 제안</h4>
-              <p class="text-[10px] text-stone-500">궁금한 점이나 새로운 레시피를 남겨주세요</p>
+        <!-- Inquiry & KakaoTalk Consultation Quick Banners -->
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          <div onclick="switchTab('contact')" class="bg-white border border-stone-200/80 rounded-2xl p-2.5 flex items-center justify-between cursor-pointer hover:bg-stone-50 active:scale-[0.98] transition-all">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-md-secondaryContainer text-md-primary flex items-center justify-center shadow-xs shrink-0">
+                <span class="material-symbols-rounded text-base">support_agent</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-stone-800 leading-tight">1:1 문의 &amp; FAQ</h4>
+                <p class="text-[10px] text-stone-500">앱 개선 제안</p>
+              </div>
             </div>
           </div>
-          <span class="material-symbols-rounded text-stone-400 text-sm">chevron_right</span>
+          <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" class="bg-[#FEE500] hover:bg-[#FADA0A] border border-amber-300 rounded-2xl p-2.5 flex items-center justify-between text-[#3C1E1E] cursor-pointer active:scale-[0.98] transition-all shadow-xs">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-[#3C1E1E] text-[#FEE500] flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-xs text-[#191919] leading-tight">카톡 1:1 상담</h4>
+                <p class="text-[10px] text-[#3C1E1E]/80 font-medium">오픈채팅 연결</p>
+              </div>
+            </div>
+            <span class="material-symbols-rounded text-sm text-[#3C1E1E]">open_in_new</span>
+          </a>
         </div>
       </section>
 
@@ -590,6 +609,19 @@
 
         <!-- Android System Settings & Support -->
         <div class="bg-white rounded-3xl p-3 border border-stone-200/80 shadow-sm space-y-1.5 text-xs">
+          <!-- KakaoTalk Open Chat Direct Row -->
+          <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-2 hover:bg-amber-50/70 rounded-2xl cursor-pointer bg-amber-50/50 border border-amber-200/60 transition-colors">
+            <span class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-[#FEE500] flex items-center justify-center shrink-0 shadow-xs">
+                <svg class="w-3.5 h-3.5 fill-[#3C1E1E]" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
+              </div>
+              <span class="font-bold text-stone-900">카카오톡 1:1 오픈채팅 문의</span>
+            </span>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] font-bold text-amber-900 bg-amber-200 px-2 py-0.5 rounded-full">실시간 상담</span>
+              <span class="material-symbols-rounded text-stone-400 text-sm">open_in_new</span>
+            </div>
+          </a>
           <!-- 1:1 Contact Item -->
           <div onclick="switchTab('contact')" class="flex items-center justify-between p-2 hover:bg-stone-50 rounded-2xl cursor-pointer">
             <span class="flex items-center gap-2">
@@ -643,6 +675,29 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> 응답 가능
           </span>
         </div>
+
+        <!-- Prominent KakaoTalk Open Chat Banner at the very top -->
+        <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" class="block mb-3.5 p-3.5 rounded-3xl bg-[#FEE500] hover:bg-[#FADA0A] text-[#3C1E1E] shadow-sm border border-amber-300 active:scale-[0.98] transition-all">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-2xl bg-[#3C1E1E] text-[#FEE500] flex items-center justify-center shrink-0 shadow-xs">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="font-black text-xs text-[#191919]">카카오톡 1:1 오픈채팅</h3>
+                  <span class="text-[9px] font-bold bg-[#3C1E1E] text-white px-1.5 py-0.5 rounded-full">실시간 상담</span>
+                </div>
+                <p class="text-[10px] text-[#3C1E1E]/80 font-medium">일반 문의 및 기타 질문은 카톡에서 가장 빠릅니다!</p>
+              </div>
+            </div>
+          </div>
+          <div class="w-full py-2 rounded-xl bg-[#3C1E1E] hover:bg-[#251313] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors">
+            <svg class="w-3.5 h-3.5 fill-[#FEE500]" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
+            카카오톡 오픈채팅방 바로 입장하기
+            <span class="material-symbols-rounded text-sm">open_in_new</span>
+          </div>
+        </a>
 
         <!-- Material 3 Segmented Toggle: [1:1 문의하기] vs [자주 묻는 질문 FAQ] -->
         <div class="bg-stone-200/70 p-1 rounded-2xl flex items-center mb-3 text-xs font-semibold">
@@ -924,6 +979,12 @@
         <div class="w-32 h-1 bg-stone-400/60 rounded-full"></div>
       </div>
     </nav>
+
+    <!-- Floating KakaoTalk Action Button inside app frame -->
+    <a href="https://open.kakao.com/o/sWxAEcSi" target="_blank" rel="noopener noreferrer" id="floating-kakao-btn" title="카카오톡 1:1 오픈채팅 문의" class="fixed sm:absolute bottom-20 right-4 z-40 bg-[#FEE500] hover:bg-[#FADA0A] text-[#3C1E1E] px-3.5 py-2 rounded-full shadow-2xl border-2 border-white flex items-center gap-1.5 active:scale-95 transition-transform animate-pulse">
+      <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.85 1.87 5.352 4.693 6.755-.205.748-.756 2.768-.868 3.204-.14.542.198.534.417.389.172-.114 2.697-1.815 3.774-2.54.636.096 1.3.148 1.984.148 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
+      <span class="text-xs font-black tracking-tight">카톡 상담</span>
+    </a>
 
     <!-- Android Toast Notification Component -->
     <div id="android-toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-stone-900/90 text-white text-xs px-4 py-2.5 rounded-full shadow-lg pointer-events-none transition-all duration-300 opacity-0 z-50 flex items-center gap-2">
