@@ -142,6 +142,9 @@
     <div class="flex items-center gap-2 bg-stone-900/80 px-3 py-1 rounded-full border border-stone-700">
       <button onclick="togglePhoneMode(false)" id="btn-mockup" class="px-2 py-0.5 rounded text-emerald-400 font-bold bg-emerald-950/70 text-[11px]">안드로이드 목업</button>
       <button onclick="togglePhoneMode(true)" id="btn-full" class="px-2 py-0.5 rounded text-stone-400 hover:text-white text-[11px]">전체화면</button>
+      <button onclick="shareApp()" title="앱 주소 공유" class="px-2 py-0.5 rounded text-stone-300 hover:text-emerald-300 text-[11px] flex items-center gap-1 bg-stone-800/80 active:scale-95 transition-transform">
+        <span class="material-symbols-rounded text-[13px]">share</span> 공유
+      </button>
     </div>
   </div>
 
@@ -183,6 +186,9 @@
           </div>
         </div>
         <div class="flex items-center gap-1">
+          <button onclick="shareApp()" id="btn-share-app" title="앱 공유" class="px-2.5 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
+            <span class="material-symbols-rounded text-sm text-md-primary">share</span> 공유
+          </button>
           <button onclick="installPWA()" id="btn-install-app" title="앱 설치" class="px-2.5 py-1 rounded-full bg-md-secondaryContainer text-md-onSecondaryContainer text-xs font-bold flex items-center gap-1 hover:bg-emerald-200 active:scale-95 transition-all">
             <span class="material-symbols-rounded text-sm">download</span> 설치
           </button>
@@ -311,9 +317,14 @@
             <span class="bg-md-primary/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold">
               지중해 슈퍼푸드
             </span>
-            <button onclick="toggleBookmark(this)" class="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-accent-coral shadow-sm">
-              <span class="material-symbols-rounded text-[20px]">bookmark</span>
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button onclick="shareApp()" title="레시피 공유" class="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-stone-700 shadow-sm active:scale-95 transition-transform hover:bg-white">
+                <span class="material-symbols-rounded text-[20px]">share</span>
+              </button>
+              <button onclick="toggleBookmark(this)" class="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-accent-coral shadow-sm active:scale-95 transition-transform">
+                <span class="material-symbols-rounded text-[20px]">bookmark</span>
+              </button>
+            </div>
           </div>
 
           <div class="absolute bottom-3 left-3 right-3 text-white">
@@ -562,6 +573,13 @@
 
         <!-- Android System Settings -->
         <div class="bg-white rounded-3xl p-3 border border-stone-200/80 shadow-sm space-y-1.5 text-xs">
+          <div onclick="shareApp()" class="flex items-center justify-between p-2 hover:bg-stone-50 rounded-2xl cursor-pointer">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-rounded text-md-primary text-[18px]">share</span>
+              앱 주소 공유하기 (카카오톡, 링크 복사)
+            </span>
+            <span class="material-symbols-rounded text-stone-400 text-sm">chevron_right</span>
+          </div>
           <div onclick="showAndroidToast('삼성 헬스(Samsung Health) 동기화가 활성화되었습니다')" class="flex items-center justify-between p-2 hover:bg-stone-50 rounded-2xl cursor-pointer">
             <span class="flex items-center gap-2">
               <span class="material-symbols-rounded text-md-primary text-[18px]">sync_alt</span>
@@ -672,6 +690,44 @@
         });
       } else {
         showAndroidToast('홈 화면에 추가하여 앱처럼 사용할 수 있습니다.');
+      }
+    }
+
+    // App Share Functionality (Web Share API + Clipboard Fallback)
+    async function shareApp() {
+      const liveUrl = window.location.protocol.startsWith('http') && !window.location.hostname.includes('localhost') 
+        ? window.location.href 
+        : 'https://stitch-0929-v2.vercel.app';
+      
+      const shareData = {
+        title: 'Mediterra - 지중해 식단 스마트 쿠킹',
+        text: '자연이 선물한 건강한 식탁, Mediterra 안드로이드 스마트 앱을 만나보세요! 🌿',
+        url: liveUrl
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          showAndroidToast('앱 링크가 공유되었습니다! 🌿');
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.log('Share API error:', err);
+          } else {
+            return;
+          }
+        }
+      }
+
+      // Clipboard fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(liveUrl).then(() => {
+          showAndroidToast('앱 주소가 클립보드에 복사되었습니다! 🔗');
+        }).catch(() => {
+          prompt('앱 주소를 복사하여 공유하세요:', liveUrl);
+        });
+      } else {
+        prompt('앱 주소를 복사하여 공유하세요:', liveUrl);
       }
     }
 
